@@ -1,93 +1,59 @@
 package carrinho;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import produto.Produto;
 import produto.ProdutoNaoEncontradoException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-@DisplayName("Classe para teste do carrinho")
 public class CarrinhoTest {
 
-    private Carrinho cart;
+    private Carrinho carrinho;
+    private Produto produto1;
+    private Produto produto2;
 
     @BeforeEach
-    public void init() {
-        cart = new Carrinho();
-    }
-
-    @DisplayName("Testa retorno do valor total")
-    @Test
-    public void testaRetornoTotal() {
-        Produto p1 = new Produto("Notebook", 3500.00);
-        Produto p2 = new Produto("Mouse", 150.00);
-        Produto p3 = new Produto("Teclado", 200.00);
-
-        cart.addItem(p1);
-        cart.addItem(p2);
-        cart.addItem(p3);
-
-        double valorTotal = cart.getValorTotal();
-
-        assertEquals(3850.00, valorTotal);
+    public void setUp() {
+        carrinho = new Carrinho();
+        produto1 = new Produto("Produto 1", 100.0);
+        produto2 = new Produto("Produto 2", 200.0);
     }
 
     @Test
-    public void testAddItem() {
-        Produto p1 = new Produto("Notebook", 3500.00);
-        Produto p2 = new Produto("Mouse", 150.00);
-
-        cart.addItem(p1);
-        cart.addItem(p2);
-
-        int cartLen = cart.getQtdeItems();
-        assertEquals(2, cartLen);
+    public void testAdicionarItem() {
+        carrinho.addItem(produto1);
+        assertEquals(1, carrinho.getQtdeItems());
     }
 
     @Test
-    public void testRemoveItem() {
-        Produto p1 = new Produto("Notebook", 3500.00);
-        Produto p2 = new Produto("Mouse", 150.00);
-
-        try {
-            cart.addItem(p1);
-            cart.addItem(p2);
-            cart.removeItem(p2);
-
-            int cartLen = cart.getQtdeItems();
-            assertEquals(1, cartLen);
-
-        } catch (ProdutoNaoEncontradoException e) {
-            fail("Produto não encontrado ao tentar remover item.");
-        }
+    public void testGetValorTotal() {
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+        assertEquals(300.0, carrinho.getValorTotal());
     }
 
     @Test
-    public void testRemoveItemComException() {
+    public void testRemoverItemExistente() throws ProdutoNaoEncontradoException {
+        carrinho.addItem(produto1);
+        carrinho.removeItem(produto1);
+        assertEquals(0, carrinho.getQtdeItems());
+    }
+
+    @Test
+    public void testRemoverItemInexistenteLancaExcecao() {
         assertThrows(ProdutoNaoEncontradoException.class, () -> {
-            Produto p1 = new Produto("Notebook", 3500.00);
-            Produto p2 = new Produto("Mouse", 150.00);
-
-            cart.addItem(p1);
-            cart.removeItem(p2);
+            carrinho.removeItem(produto1);
         });
     }
 
     @Test
-    public void testEsvazia() {
-        Produto p1 = new Produto("Notebook", 3500.00);
-        Produto p2 = new Produto("Mouse", 150.00);
-        Produto p3 = new Produto("Teclado", 200.00);
-
-        cart.esvazia();
-
-        int cartLen = cart.getQtdeItems();
-        assertEquals(0, cartLen);
+    public void testEsvaziarCarrinho() {
+        carrinho.addItem(produto1);
+        carrinho.addItem(produto2);
+        carrinho.esvazia();
+        assertEquals(0, carrinho.getQtdeItems());
+        assertEquals(0.0, carrinho.getValorTotal());
     }
 }
